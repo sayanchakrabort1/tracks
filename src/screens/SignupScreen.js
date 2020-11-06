@@ -4,6 +4,7 @@ import { Input, Button , Text } from 'react-native-elements';
 import {Context as AuthContext} from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
 import NavLink from '../components/NavLink';
+import tryLocalSignin from '../..'
 
 const SignupScreen = ({ navigation }) => {
 
@@ -17,7 +18,7 @@ const SignupScreen = ({ navigation }) => {
       submitBtnTxt="Sign Up"
       onSubmit={signup}
       />
-      <NavLink 
+      <NavLink
         text='Already have an account? Sign in instead.'
         routeName='Signin'
       />

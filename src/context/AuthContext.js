@@ -12,14 +12,25 @@ const authReducer = ( state, action) => {
                 errorMessage: action.payload
             };
         case 'signup':
+        case 'signin':
             return {
                 ...state,
                 token: action.payload,
                 errorMessage: ''
+            };
+
+        case 'clear_error_message':
+            return {
+                ...state,
+                errorMessage: ''
             }
-            
+
         default: return state;
     };
+};
+
+const clearErrorMessage = dispatch => () => {
+    dispatch({ type: 'clear_error_message'});
 };
 
 const signup = (dispatch) => {
@@ -35,21 +46,52 @@ const signup = (dispatch) => {
             });
 
             navigate('TrackList');
-            
+
 
         } catch(err){
             dispatch({
                 type: 'add_error',
                 payload: err.message
-            })
+            });
+        }
+    };
+};
+
+const signin = (dispatch) => {
+    return async ({email, password}) => {
+        try{
+            const response = await trackerApi.post('/signin' , { email , password });
+            const token = response.data.token;
+
+            await AsyncStorage.setItem( 'token', token);
+            dispatch({
+                type: 'signin',
+                payload: token
+            });
+
+            navigate('TrackList');
+
+
+        } catch(err){
+            dispatch({
+                type: 'add_error',
+                payload: err.message
+            });
         }
     };
 }
 
-const signin = (dispatch) => {
-    return ({email, password}) => {
+const tryLocalSignin = dispatch = async () => {
+    const token = await AsyncStorage.getItem('token');
 
-    };
+    if(token){
+        dispatch({
+            type: 'signin', payload: token
+        });
+        navigate('TrackList');
+    } else {
+        navigage('singup');
+    }
 }
 
 const signout = (dispatch) => {
@@ -60,7 +102,7 @@ const signout = (dispatch) => {
 
 export const { Provider, Context } = createDataContext(
     authReducer,
-    { signup, signin, signout },
+    { signup, signin, signout, clearErrorMessage, tryLocalSignin },
     {
         token: null,
         errMessage: ''
